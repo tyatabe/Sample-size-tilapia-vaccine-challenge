@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Sample size for tilapia challenge with francisella
+# Sample size for tilapia challenge with francisella
 
 Assumptions
 
@@ -61,7 +61,7 @@ Sample size accounting for clustering within tanks, with three levels of intra-c
 # ICC of 0.3, 0.5, 0.7, 0.9
 rho1 <- 0.3
 rho2 <- 0.5
-rho3 <- 0.7
+rho3 <- 0.78
 rho4 <- 0.9
 # Sample size for each ICC
 nprime_0.3 <- n*(1+rho1*(nfish-1))
@@ -70,7 +70,7 @@ nprime_0.7 <- n*(1+rho3*(nfish-1))
 nprime_0.9 <- n*(1+rho4*(nfish-1))
 
 # Number of tanks (rounding up) required for each ICC, stocking 20 fish per tank
-ntanks <- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9)/20)
+ntanks <- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9)/nfish)
 
 # Making a table from this
 ICC <- c(rho1, rho2, rho3, rho4)
@@ -82,9 +82,87 @@ colnames(samples) <- c("ICC", "No of fish per group", "No tanks per group")
 
 ```
 
-#Sample size for different levels of ICC
+###Sample size for different levels of ICC: challenge trial
 ``` {r, eval=T, echo=F}
 samples
 ```
 
+# Sample size for estimating expression of cytokines (Ct values)
 
+Assumptions
+```{r, eval=T}
+# No of treatment groups: best oral + best immersion + 1 E. coli + 1 adjuvant
+tx <- 4
+# No replica per treatment: challenged
+repli.ch <- 4
+# Fish per replica
+nfish <- 5
+# Range of Ct values
+Ctmin <- 20
+Ctmax <- 40
+rangect <- Ctmax - Ctmin
+# Approximation of variance of Ct values
+sigma <- rangect/4
+sigma2 <- sigma^2
+# Delta Ct (difference between Ct values)
+delta <- 5
+```
+
+###Sample size per group, without accounting for clustering within tanks
+```{r, eval=T}
+n <- 2*(((za-zb)^2)*sigma2/delta^2)
+ceiling(n)
+```
+Sample size accounting for clustering within tanks, with three levels of intra-class correlation (ICC): 0.3, 0.5, 0.7, 0.9
+```{r, eval=T}
+# Sample size for each ICC
+nprime_0.3 <- n*(1+rho1*(nfish-1))
+nprime_0.5 <- n*(1+rho2*(nfish-1))
+nprime_0.7 <- n*(1+rho3*(nfish-1))
+nprime_0.9 <- n*(1+rho4*(nfish-1))
+
+# Number of tanks (rounding up) required for each ICC, stocking 20 fish per tank
+ntanks <- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9)/nfish)
+
+# Making a table from this
+ICC <- c(rho1, rho2, rho3, rho4)
+nprime <- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9))
+
+
+samples <- data.frame(ICC, nprime, ntanks)
+colnames(samples) <- c("ICC", "No of fish per group", "No tanks per group")
+
+```
+
+### Sample size for different levels of ICC: gene expression trial
+```{r, eval=T, echo=F}
+samples
+```
+
+Now assuming 20 fish per tank
+```{r, eval=T}
+# No fish per tank
+nfish <- 20
+# Sample size for each ICC
+nprime_0.3 <- n*(1+rho1*(nfish-1))
+nprime_0.5 <- n*(1+rho2*(nfish-1))
+nprime_0.7 <- n*(1+rho3*(nfish-1))
+nprime_0.9 <- n*(1+rho4*(nfish-1))
+
+# Number of tanks (rounding up) required for each ICC, stocking 20 fish per tank
+ntanks <- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9)/nfish)
+
+# Making a table from this
+ICC <- c(rho1, rho2, rho3, rho4)
+nprime <- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9))
+
+
+samples <- data.frame(ICC, nprime, ntanks)
+colnames(samples) <- c("ICC", "No of fish per group", "No tanks per group")
+
+```
+
+### Sample size for different levels of ICC: gene expression trial with tanks of 20 fish each
+```{r, eval=T, echo=F}
+samples
+```

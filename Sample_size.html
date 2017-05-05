@@ -123,8 +123,8 @@ $(document).ready(function () {
 </div>
 
 
-<div id="sample-size-for-tilapia-challenge-with-francisella" class="section level2">
-<h2>Sample size for tilapia challenge with francisella</h2>
+<div id="sample-size-for-tilapia-challenge-with-francisella" class="section level1">
+<h1>Sample size for tilapia challenge with francisella</h1>
 <p>Assumptions</p>
 <pre class="r"><code># No of treatment groups: 2 live mutants + 6 recombinant mutants + 1 E. coli + 1 adjuvant
 tx &lt;- 10
@@ -161,7 +161,7 @@ zb &lt;- qnorm(pow, 0, 1, lower.tail=F)</code></pre>
 <pre class="r"><code># ICC of 0.3, 0.5, 0.7, 0.9
 rho1 &lt;- 0.3
 rho2 &lt;- 0.5
-rho3 &lt;- 0.7
+rho3 &lt;- 0.78
 rho4 &lt;- 0.9
 # Sample size for each ICC
 nprime_0.3 &lt;- n*(1+rho1*(nfish-1))
@@ -170,7 +170,56 @@ nprime_0.7 &lt;- n*(1+rho3*(nfish-1))
 nprime_0.9 &lt;- n*(1+rho4*(nfish-1))
 
 # Number of tanks (rounding up) required for each ICC, stocking 20 fish per tank
-ntanks &lt;- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9)/20)
+ntanks &lt;- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9)/nfish)
+
+# Making a table from this
+ICC &lt;- c(rho1, rho2, rho3, rho4)
+nprime &lt;- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9))
+
+
+samples &lt;- data.frame(ICC, nprime, ntanks)
+colnames(samples) &lt;- c(&quot;ICC&quot;, &quot;No of fish per group&quot;, &quot;No tanks per group&quot;)</code></pre>
+<div id="sample-size-for-different-levels-of-icc-challenge-trial" class="section level3">
+<h3>Sample size for different levels of ICC: challenge trial</h3>
+<pre><code>##    ICC No of fish per group No tanks per group
+## 1 0.30                   34                  2
+## 2 0.50                   54                  3
+## 3 0.78                   80                  4
+## 4 0.90                   92                  5</code></pre>
+</div>
+</div>
+<div id="sample-size-for-estimating-expression-of-cytokines-ct-values" class="section level1">
+<h1>Sample size for estimating expression of cytokines (Ct values)</h1>
+<p>Assumptions</p>
+<pre class="r"><code># No of treatment groups: best oral + best immersion + 1 E. coli + 1 adjuvant
+tx &lt;- 4
+# No replica per treatment: challenged
+repli.ch &lt;- 4
+# Fish per replica
+nfish &lt;- 5
+# Range of Ct values
+Ctmin &lt;- 20
+Ctmax &lt;- 40
+rangect &lt;- Ctmax - Ctmin
+# Approximation of variance of Ct values
+sigma &lt;- rangect/4
+sigma2 &lt;- sigma^2
+# Delta Ct (difference between Ct values)
+delta &lt;- 5</code></pre>
+<div id="sample-size-per-group-without-accounting-for-clustering-within-tanks" class="section level3">
+<h3>Sample size per group, without accounting for clustering within tanks</h3>
+<pre class="r"><code>n &lt;- 2*(((za-zb)^2)*sigma2/delta^2)
+ceiling(n)</code></pre>
+<pre><code>## [1] 16</code></pre>
+<p>Sample size accounting for clustering within tanks, with three levels of intra-class correlation (ICC): 0.3, 0.5, 0.7, 0.9</p>
+<pre class="r"><code># Sample size for each ICC
+nprime_0.3 &lt;- n*(1+rho1*(nfish-1))
+nprime_0.5 &lt;- n*(1+rho2*(nfish-1))
+nprime_0.7 &lt;- n*(1+rho3*(nfish-1))
+nprime_0.9 &lt;- n*(1+rho4*(nfish-1))
+
+# Number of tanks (rounding up) required for each ICC, stocking 20 fish per tank
+ntanks &lt;- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9)/nfish)
 
 # Making a table from this
 ICC &lt;- c(rho1, rho2, rho3, rho4)
@@ -180,13 +229,41 @@ nprime &lt;- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9))
 samples &lt;- data.frame(ICC, nprime, ntanks)
 colnames(samples) &lt;- c(&quot;ICC&quot;, &quot;No of fish per group&quot;, &quot;No tanks per group&quot;)</code></pre>
 </div>
-<div id="sample-size-for-different-levels-of-icc" class="section level1">
-<h1>Sample size for different levels of ICC</h1>
-<pre><code>##   ICC No of fish per group No tanks per group
-## 1 0.3                   34                  2
-## 2 0.5                   54                  3
-## 3 0.7                   73                  4
-## 4 0.9                   92                  5</code></pre>
+<div id="sample-size-for-different-levels-of-icc-gene-expression-trial" class="section level3">
+<h3>Sample size for different levels of ICC: gene expression trial</h3>
+<pre><code>##    ICC No of fish per group No tanks per group
+## 1 0.30                   35                  7
+## 2 0.50                   48                 10
+## 3 0.78                   65                 13
+## 4 0.90                   73                 15</code></pre>
+<p>Now assuming 20 fish per tank</p>
+<pre class="r"><code># No fish per tank
+nfish &lt;- 20
+# Sample size for each ICC
+nprime_0.3 &lt;- n*(1+rho1*(nfish-1))
+nprime_0.5 &lt;- n*(1+rho2*(nfish-1))
+nprime_0.7 &lt;- n*(1+rho3*(nfish-1))
+nprime_0.9 &lt;- n*(1+rho4*(nfish-1))
+
+# Number of tanks (rounding up) required for each ICC, stocking 20 fish per tank
+ntanks &lt;- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9)/nfish)
+
+# Making a table from this
+ICC &lt;- c(rho1, rho2, rho3, rho4)
+nprime &lt;- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9))
+
+
+samples &lt;- data.frame(ICC, nprime, ntanks)
+colnames(samples) &lt;- c(&quot;ICC&quot;, &quot;No of fish per group&quot;, &quot;No tanks per group&quot;)</code></pre>
+</div>
+<div id="sample-size-for-different-levels-of-icc-gene-expression-trial-with-tanks-of-20-fish-each" class="section level3">
+<h3>Sample size for different levels of ICC: gene expression trial with tanks of 20 fish each</h3>
+<pre><code>##    ICC No of fish per group No tanks per group
+## 1 0.30                  106                  6
+## 2 0.50                  165                  9
+## 3 0.78                  249                 13
+## 4 0.90                  285                 15</code></pre>
+</div>
 </div>
 
 
