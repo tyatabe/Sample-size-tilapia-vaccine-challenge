@@ -1,0 +1,90 @@
+---
+title: "Sample_size"
+author: "Tada"
+date: "May 5, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Sample size for tilapia challenge with francisella
+
+Assumptions
+
+```{r, eval=T}
+# No of treatment groups: 2 live mutants + 6 recombinant mutants + 1 E. coli + 1 adjuvant
+tx <- 10
+# No replica per treatment: challenged
+repli.ch <- 4
+## No replica per treatment: not challenged
+repli.uch <- 4
+# Fish per replica
+nfish <- 20
+# Mortality (probability) control
+p1 <- 0.9
+q1 <- 1-p1
+# Mortality (probability) vaccinated
+p2 <- 0.3
+q2 <- 1-p2
+# Common prob
+p <- mean(c(p1, p2))
+q <- 1-p
+
+```
+
+Confidence and power required
+```{r, eval=T}
+# alpha (probability of type I error)
+alpha <- 0.05
+confidence <- 1-alpha/2
+# beta (probability of type II error)
+beta <- 0.2
+# Power (1 - beta)
+pow <- 1 - beta
+# Standard normal of alpha
+za <- qnorm(confidence, 0, 1)
+# Standard normal of power
+zb <- qnorm(pow, 0, 1, lower.tail=F)
+```  
+  
+  
+Sample size per group, without accounting for clustering within tanks
+```{r, eval=T}
+n <- (za*sqrt(2*p*q) - zb*sqrt(p1*q1 + p2*q2)) / (p1 - p2)^2
+  
+```
+Sample size accounting for clustering within tanks, with three levels of intra-class correlation (ICC): 0.3, 0.5, 0.7, 0.9
+
+```{r, eval=T}
+# ICC of 0.3, 0.5, 0.7, 0.9
+rho1 <- 0.3
+rho2 <- 0.5
+rho3 <- 0.7
+rho4 <- 0.9
+# Sample size for each ICC
+nprime_0.3 <- n*(1+rho1*(nfish-1))
+nprime_0.5 <- n*(1+rho2*(nfish-1))
+nprime_0.7 <- n*(1+rho3*(nfish-1))
+nprime_0.9 <- n*(1+rho4*(nfish-1))
+
+# Number of tanks (rounding up) required for each ICC, stocking 20 fish per tank
+ntanks <- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9)/20)
+
+# Making a table from this
+ICC <- c(rho1, rho2, rho3, rho4)
+nprime <- ceiling(c(nprime_0.3, nprime_0.5, nprime_0.7, nprime_0.9))
+
+
+samples <- data.frame(ICC, nprime, ntanks)
+colnames(samples) <- c("ICC", "No of fish per group", "No tanks per group")
+
+```
+
+#Sample size for different levels of ICC
+``` {r, eval=T, echo=F}
+samples
+```
+
+
